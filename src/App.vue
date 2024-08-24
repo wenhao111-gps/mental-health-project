@@ -1,10 +1,18 @@
 <script setup>
-import LoginPage from './components/LoginPage.vue'
-import RegisterPage from './components/RegisterPage.vue'
+import BHeader from './components/BHeader.vue'
+import LoginPage from './views/LoginPage.vue'
+import RegisterPage from './views/RegisterPage.vue'
 </script>
 
 <template>
-  <RegisterPage />
+  <div class="main-container">
+    <header>
+      <BHeader />
+    </header>
+    <main class="main-box">
+      <router-view></router-view>
+    </main>
+  </div>
 </template>
 
 <style scoped>
