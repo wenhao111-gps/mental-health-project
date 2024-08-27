@@ -10,6 +10,9 @@
         <li class="nav-item">
           <router-link to="/Login" class="nav-link" active-class="active">Login</router-link>
         </li>
+        <li class="nav-item">
+          <router-link to="/HomePage" class="nav-link" active-class="active">Home</router-link>
+        </li>
       </ul>
     </header>
   </div>
