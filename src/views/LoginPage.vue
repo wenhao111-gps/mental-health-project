@@ -22,7 +22,6 @@
               />
             </div>
           </div>
-
           <div class="text-center">
             <button type="submit" class="btn btn-primary me-2">Login</button>
           </div>
@@ -43,12 +42,24 @@ const formData = ref({
 
 const router = useRouter()
 
+const generateToken = (username) => {
+  return btoa(username + ':' + new Date().getTime())
+}
+
 const login = () => {
-  if (formData.value.username === 'admin' && formData.value.password === '123456') {
+  const allUsersData = JSON.parse(localStorage.getItem('allUsersData')) || []
+  const matchingUser = allUsersData.find(
+    (user) => user.username === formData.value.username && user.password === formData.value.password
+  )
+
+  if (matchingUser) {
+    const token = generateToken(matchingUser.username)
+    localStorage.setItem('token', token)
+    localStorage.setItem('currentUser', matchingUser.username)
+
     router.push('/HomePage')
-    localStorage.setItem('token', 'admin')
   } else {
-    alert('The username or password is wrong')
+    alert('The username or password is incorrect')
   }
 }
 </script>

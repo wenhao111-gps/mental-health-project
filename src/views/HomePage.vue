@@ -1,6 +1,6 @@
 <template>
   <h1>This is the home page</h1>
-  <p>Welcome, {{ tokenName }}</p>
+  <p>Welcome, {{ username }}</p>
   <button @click="logOff">Log off</button>
 </template>
 
@@ -10,12 +10,18 @@ import { ref, onMounted } from 'vue'
 
 const router = useRouter()
 
-const tokenName = ref('')
+const username = ref('')
 
 onMounted(() => {
-  const token = localStorage.getItem('token')
-  if (token) {
-    tokenName.value = token
+  const allUsersData = JSON.parse(localStorage.getItem('allUsersData')) || []
+  const currentUser = localStorage.getItem('currentUser')
+  if (currentUser) {
+    const user = allUsersData.find((user) => user.username === currentUser)
+    if (user) {
+      username.value = user.username
+    } else {
+      router.push('/login')
+    }
   } else {
     router.push('/login')
   }
@@ -23,7 +29,7 @@ onMounted(() => {
 
 const logOff = () => {
   localStorage.removeItem('token')
-
+  localStorage.removeItem('currentUser')
   router.push('/login')
 }
 </script>

@@ -115,6 +115,9 @@ const submitForm = () => {
     !errors.value.email &&
     !errors.value.gender
   ) {
+    const existingUsers = JSON.parse(localStorage.getItem('allUsersData')) || []
+    existingUsers.push({ ...formData.value })
+    localStorage.setItem('allUsersData', JSON.stringify(existingUsers))
     submittedData.value.push({ ...formData.value })
     clearForm()
   }
