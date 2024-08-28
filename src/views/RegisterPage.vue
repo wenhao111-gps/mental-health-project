@@ -81,6 +81,16 @@
               <div v-if="errors.email" class="text-danger">{{ errors.email }}</div>
             </div>
           </div>
+          <div class="row justify-content-center">
+            <div class="col-6 mb-3">
+              <label for="role" class="form-label">Role:</label>
+              <select class="form-select" id="role" v-model="formData.role">
+                <option value="Admin">Admin</option>
+                <option value="Editor">Editor</option>
+                <option value="Viewer">Viewer</option>
+              </select>
+            </div>
+          </div>
           <div class="text-center">
             <button type="submit" class="btn btn-primary me-2">Submit</button>
             <button type="button" class="btn btn-secondary" @click="clearForm">Clear</button>
@@ -101,7 +111,8 @@ const formData = ref({
   password: '',
   confirmPassword: '',
   gender: '',
-  email: ''
+  email: '',
+  role: ''
 })
 
 const submittedData = ref([])
@@ -113,7 +124,8 @@ const submitForm = () => {
     !errors.value.password &&
     !errors.value.confirmPassword &&
     !errors.value.email &&
-    !errors.value.gender
+    !errors.value.gender &&
+    !errors.value.role
   ) {
     const existingUsers = JSON.parse(localStorage.getItem('allUsersData')) || []
     existingUsers.push({ ...formData.value })
@@ -129,7 +141,8 @@ const clearForm = () => {
     password: '',
     confirmPassword: '',
     gender: '',
-    email: ''
+    email: '',
+    role: ''
   }
 }
 
@@ -138,7 +151,8 @@ const errors = ref({
   password: null,
   confirmPassword: null,
   gender: null,
-  email: null
+  email: null,
+  role: null
 })
 
 const validateName = (blur) => {
