@@ -55,8 +55,7 @@ const login = () => {
   if (matchingUser) {
     const token = generateToken(matchingUser.username)
     localStorage.setItem('token', token)
-    localStorage.setItem('currentUser', matchingUser.username)
-    localStorage.setItem('currentUserRole', matchingUser.role)
+    localStorage.setItem('currentUser', JSON.stringify(matchingUser))
 
     router.push('/HomePage')
   } else {
