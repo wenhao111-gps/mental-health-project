@@ -56,7 +56,6 @@ const router = useRouter()
 
 const username = ref('')
 const role = ref('')
-const editableContent = ref('')
 
 const isAdminOrEditor = ref(false)
 
@@ -94,10 +93,6 @@ onMounted(() => {
     username.value = storedUser.username
     role.value = storedUser.role
     isAdminOrEditor.value = role.value === 'Admin' || role.value === 'Editor'
-
-    if (isAdminOrEditor.value) {
-      editableContent.value = loadContent()
-    }
   } else {
     router.push('/login')
   }
@@ -157,14 +152,5 @@ const logOff = () => {
   localStorage.removeItem('token')
   localStorage.removeItem('currentUser')
   router.push('/login')
-}
-
-const loadContent = () => {
-  return localStorage.getItem('editableContent') || 'Editable content here...'
-}
-
-const saveContent = () => {
-  localStorage.setItem('editableContent', editableContent.value)
-  console.log('Content saved: ', editableContent.value)
 }
 </script>
