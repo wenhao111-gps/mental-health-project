@@ -103,6 +103,9 @@
 
 <script setup>
 import { ref } from 'vue'
+import { createUserWithEmailAndPassword } from 'firebase/auth'
+import { doc, setDoc } from 'firebase/firestore'
+import { auth, db } from '@/firebase/init'
 
 const formData = ref({
   username: '',
@@ -115,7 +118,7 @@ const formData = ref({
 
 const submittedData = ref([])
 
-const submitForm = () => {
+const submitForm = async () => {
   validateName(true)
   if (
     !errors.value.username &&
@@ -125,11 +128,31 @@ const submitForm = () => {
     !errors.value.gender &&
     !errors.value.role
   ) {
-    const existingUsers = JSON.parse(localStorage.getItem('allUsersData')) || []
-    existingUsers.push({ ...formData.value })
-    localStorage.setItem('allUsersData', JSON.stringify(existingUsers))
-    submittedData.value.push({ ...formData.value })
-    clearForm()
+    try {
+      const data = await createUserWithEmailAndPassword(
+        auth,
+        formData.value.email,
+        formData.value.password
+      )
+      const user = data.user
+
+      console.log('Firebase Register Successful!')
+
+      await setDoc(doc(db, 'users', user.uid), {
+        username: formData.value.username,
+        email: user.email,
+        gender: formData.value.gender,
+        role: formData.value.role
+      })
+
+      console.log('User data saved in Firestore!')
+
+      submittedData.value.push({ ...formData.value })
+
+      clearForm()
+    } catch (error) {
+      console.error('Error submitting form to Firestore: ', error)
+    }
   }
 }
 
