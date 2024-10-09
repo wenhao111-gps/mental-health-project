@@ -1,7 +1,5 @@
 <script setup>
 import BHeader from './components/BHeader.vue'
-import LoginPage from './views/LoginPage.vue'
-import RegisterPage from './views/RegisterPage.vue'
 </script>
 
 <template>

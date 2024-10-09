@@ -118,7 +118,7 @@ const formData = ref({
 
 const submittedData = ref([])
 
-const submitForm = () => {
+const submitForm = async () => {
   validateName(true)
 
   if (

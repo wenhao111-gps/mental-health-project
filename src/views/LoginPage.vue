@@ -6,8 +6,8 @@
         <form @submit.prevent="login">
           <div class="row justify-content-center">
             <div class="col-6 mb-3">
-              <label for="username" class="form-label">Username:</label>
-              <input type="text" class="form-control" id="username" v-model="formData.username" />
+              <label for="email" class="form-label">Email:</label>
+              <input type="text" class="form-control" id="email" v-model="formData.email" />
             </div>
           </div>
 
@@ -34,32 +34,33 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { auth, db } from '@/firebase/init'
+import { errorMessages } from 'vue/compiler-sfc'
+import { signInWithEmailAndPassword } from 'firebase/auth'
 
 const formData = ref({
-  username: '',
+  email: '',
   password: ''
 })
 
 const router = useRouter()
 
-const generateToken = (username) => {
-  return btoa(username + ':' + new Date().getTime())
-}
+const login = async () => {
+  try {
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      formData.value.email,
+      formData.value.password
+    )
+    const user = userCredential.user
+    console.log('Log in successful: ', user)
 
-const login = () => {
-  const allUsersData = JSON.parse(localStorage.getItem('allUsersData')) || []
-  const matchingUser = allUsersData.find(
-    (user) => user.username === formData.value.username && user.password === formData.value.password
-  )
-
-  if (matchingUser) {
-    const token = generateToken(matchingUser.username)
-    localStorage.setItem('token', token)
-    localStorage.setItem('currentUser', JSON.stringify(matchingUser))
-
+    localStorage.setItem('currentUser', JSON.stringify(user))
+    localStorage.setItem('token', await user.getIdToken())
     router.push('/HomePage')
-  } else {
-    alert('The username or password is incorrect')
+  } catch (error) {
+    console.error('Error during login: ', error)
+    errorMessages.value = 'Invalid email or password.'
   }
 }
 </script>
