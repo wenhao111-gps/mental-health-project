@@ -24,6 +24,45 @@
         </div>
 
         <button @click="logOff" class="btn btn-danger mt-3">Log off</button>
+
+        <p class="lead">Send an Email</p>
+
+        <div>
+          <h2>Send an Email</h2>
+          <form @submit.prevent="sendEmail">
+            <div class="mb-3">
+              <label for="toEmail" class="form-label">To Email:</label>
+              <input
+                type="email"
+                v-model="emailForm.toEmail"
+                class="form-control"
+                id="toEmail"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="subject" class="form-label">Subject:</label>
+              <input
+                type="text"
+                v-model="emailForm.subject"
+                class="form-control"
+                id="subject"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="message" class="form-label">Message:</label>
+              <textarea
+                v-model="emailForm.message"
+                class="form-control"
+                id="message"
+                rows="4"
+                required
+              ></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Send Email</button>
+          </form>
+        </div>
       </div>
     </div>
   </div>
@@ -51,6 +90,7 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import { ref, onMounted } from 'vue'
+import { doc } from 'firebase/firestore'
 
 const router = useRouter()
 
@@ -60,6 +100,12 @@ const role = ref('')
 const isAdminOrEditor = ref(false)
 
 const newReviewContent = ref('')
+
+const emailForm = ref({
+  toEmail: '',
+  subject: '',
+  message: ''
+})
 
 const postReview = () => {
   if (!newReviewContent.value.trim()) {
@@ -99,6 +145,31 @@ onMounted(() => {
   const saveReviews = JSON.parse(localStorage.getItem('reviews')) || []
   reviews.value = saveReviews
 })
+
+const sendEmail = () => {
+  const formData = new FormData()
+  formData.append('from', 'postmaster@sandbox403a4f9a2cc044628f608ff99a430e7d.mailgun.org')
+  formData.append('to', emailForm.value.toEmail)
+  formData.append('subject', emailForm.value.subject)
+  formData.append('text', emailForm.value.message)
+
+  fetch('https://api.mailgun.net/v3/sandbox403a4f9a2cc044628f608ff99a430e7d.mailgun.org/messages', {
+    method: 'POST',
+    headers: {
+      Authorization: 'Basic ' + btoa('api:28d68bf78c6ad49fe17443409ea1feb0-5dcb5e36-7b38e538')
+    },
+    body: formData
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log('Mailgun API response:', data)
+      alert('Email sent successfully!')
+    })
+    .catch((error) => {
+      console.error('Error sending email via Mailgun API:', error)
+      alert('Failed to send email: ' + error)
+    })
+}
 
 const submitRating = (reviewId) => {
   if (!currentUser.value) {
