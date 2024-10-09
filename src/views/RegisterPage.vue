@@ -103,6 +103,9 @@
 
 <script setup>
 import { ref } from 'vue'
+import { auth, db } from '../firebase/init'
+import { createUserWithEmailAndPassword } from 'firebase/auth'
+import { doc, setDoc } from 'firebase/firestore'
 
 const formData = ref({
   username: '',
@@ -117,6 +120,7 @@ const submittedData = ref([])
 
 const submitForm = () => {
   validateName(true)
+
   if (
     !errors.value.username &&
     !errors.value.password &&
@@ -129,7 +133,28 @@ const submitForm = () => {
     existingUsers.push({ ...formData.value })
     localStorage.setItem('allUsersData', JSON.stringify(existingUsers))
     submittedData.value.push({ ...formData.value })
-    clearForm()
+
+    createUserWithEmailAndPassword(auth, formData.value.email, formData.value.password)
+      .then((data) => {
+        const user = data.user
+        console.log('Firebase Register Successful!')
+
+        return setDoc(doc(db, 'users', user.uid), {
+          email: user.email,
+          username: formData.value.username,
+          gender: formData.value.gender,
+          role: formData.value.role
+        })
+      })
+      .then(() => {
+        console.log('User role saved in Firestore!')
+      })
+      .catch((error) => {
+        console.error('Error registering: ', error.code, error.message)
+      })
+      .finally(() => {
+        clearForm()
+      })
   }
 }
 
