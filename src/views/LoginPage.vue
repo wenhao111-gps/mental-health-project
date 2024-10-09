@@ -7,7 +7,13 @@
           <div class="row justify-content-center">
             <div class="col-6 mb-3">
               <label for="email" class="form-label">Email:</label>
-              <input type="text" class="form-control" id="email" v-model="formData.email" />
+              <input
+                type="email"
+                class="form-control"
+                id="email"
+                v-model="formData.email"
+                required
+              />
             </div>
           </div>
 
@@ -19,6 +25,7 @@
                 class="form-control"
                 id="password"
                 v-model="formData.password"
+                required
               />
             </div>
           </div>
@@ -34,34 +41,46 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { auth, db } from '@/firebase/init'
-import { errorMessages } from 'vue/compiler-sfc'
 import { signInWithEmailAndPassword } from 'firebase/auth'
+import { auth } from '../firebase/init'
 
 const formData = ref({
-  email: '',
+  username: '',
   password: ''
 })
 
 const router = useRouter()
 
-const login = async () => {
-  try {
-    const userCredential = await signInWithEmailAndPassword(
-      auth,
-      formData.value.email,
-      formData.value.password
-    )
-    const user = userCredential.user
-    console.log('Log in successful: ', user)
+const generateToken = (username) => {
+  return btoa(username + ':' + new Date().getTime())
+}
 
-    localStorage.setItem('currentUser', JSON.stringify(user))
-    localStorage.setItem('token', await user.getIdToken())
-    router.push('/HomePage')
-  } catch (error) {
-    console.error('Error during login: ', error)
-    errorMessages.value = 'Invalid email or password.'
-  }
+const login = () => {
+  const allUsersData = JSON.parse(localStorage.getItem('allUsersData')) || []
+
+  signInWithEmailAndPassword(auth, formData.value.email, formData.value.password)
+    .then((userCredential) => {
+      const user = userCredential.user
+      console.log('Firebase Login Successful!', user)
+
+      const matchingUser = allUsersData.find(
+        (user) => user.email === formData.value.email && user.password === formData.value.password
+      )
+
+      if (matchingUser) {
+        const token = generateToken(matchingUser.email)
+        localStorage.setItem('token', token)
+        localStorage.setItem('currentUser', JSON.stringify(matchingUser))
+
+        router.push('/HomePage')
+      } else {
+        alert('The email or password is incorrect')
+      }
+    })
+    .catch((error) => {
+      console.error('Error logging in with Firebase:', error.code, error.message)
+      alert('The email or password is incorrect')
+    })
 }
 </script>
 
