@@ -27,7 +27,7 @@
 
         <p class="lead">Send an Email</p>
 
-        <div>
+        <div v-if="isAdminOrEditor">
           <h2>Send an Email</h2>
           <form @submit.prevent="sendEmail">
             <div class="mb-3">
@@ -63,6 +63,19 @@
             <button type="submit" class="btn btn-primary">Send Email</button>
           </form>
         </div>
+        <div class="mt-5">
+          <table id="reviewTable" class="display">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Age</th>
+                <th>Country</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -90,7 +103,9 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import { ref, onMounted } from 'vue'
-import { doc } from 'firebase/firestore'
+import $ from 'jquery'
+import 'datatables.net'
+import 'datatables.net-dt/css/dataTables.dataTables.min.css'
 
 const router = useRouter()
 
@@ -133,6 +148,70 @@ const currentUser = ref(null)
 
 onMounted(() => {
   const storedUser = JSON.parse(localStorage.getItem('currentUser'))
+  const reviewData = [
+    { name: 'Mufinella Revie', email: 'mrevie0@cloudflare.com', age: 1, country: 'Thailand' },
+    { name: 'De Toomey', email: 'dtoomey1@shinystat.com', age: 2, country: 'Philippines' },
+    { name: 'Llewellyn Meneo', email: 'lmeneo2@etsy.com', age: 3, country: 'China' },
+    { name: 'Nata Bownass', email: 'nbownass3@discuz.net', age: 4, country: 'Indonesia' },
+    { name: 'Jacky Marin', email: 'jmarin4@gizmodo.com', age: 5, country: 'France' },
+    { name: 'Hayward McKenzie', email: 'hmckenzie5@google.ru', age: 6, country: 'China' },
+    { name: 'Janina Chalk', email: 'jchalk6@sciencedaily.com', age: 7, country: 'Poland' },
+    { name: 'Windy Alejo', email: 'walejo7@wikispaces.com', age: 8, country: 'Sweden' },
+    { name: 'Zahara Dronsfield', email: 'zdronsfield8@t-online.de', age: 9, country: 'Bahamas' },
+    { name: 'Silvain Beldon', email: 'sbeldon9@google.es', age: 10, country: 'Ukraine' },
+    { name: 'Vivie Poynzer', email: 'vpoynzera@a8.net', age: 11, country: 'Colombia' },
+    { name: 'Basilius Archbell', email: 'barchbellb@ucla.edu', age: 12, country: 'Indonesia' },
+    { name: 'Glad Eller', email: 'gellerc@blogspot.com', age: 13, country: 'Indonesia' },
+    { name: 'Robby Triplet', email: 'rtripletd@dedecms.com', age: 14, country: 'China' },
+    { name: 'Larine Nyland', email: 'lnylande@samsung.com', age: 15, country: 'France' },
+    { name: 'Lurleen Forrest', email: 'lforrestf@spotify.com', age: 16, country: 'Nigeria' },
+    {
+      name: 'Davide Woodings',
+      email: 'dwoodingsg@mayoclinic.com',
+      age: 17,
+      country: 'Czech Republic'
+    },
+    { name: 'Roxane Brockwell', email: 'rbrockwellh@discovery.com', age: 18, country: 'Egypt' },
+    { name: 'Mayor Larchier', email: 'mlarchieri@paginegialle.it', age: 19, country: 'Brazil' },
+    { name: 'Jessy Wardingley', email: 'jwardingleyj@meetup.com', age: 20, country: 'South Korea' },
+    { name: 'Claudia Mold', email: 'cmoldk@privacy.gov.au', age: 21, country: 'Mongolia' },
+    { name: 'Siouxie Nordass', email: 'snordassl@state.gov', age: 22, country: 'China' },
+    { name: 'Carolan Wayte', email: 'cwaytem@mlb.com', age: 23, country: 'Spain' },
+    { name: 'Dukey Bowden', email: 'dbowdenn@blogspot.com', age: 24, country: 'Indonesia' },
+    { name: 'Dulce Pistol', email: 'dpistolo@stanford.edu', age: 25, country: 'Sweden' },
+    { name: 'Abey Fransson', email: 'afranssonp@lulu.com', age: 26, country: 'Philippines' },
+    {
+      name: 'Dorelia Antyukhin',
+      email: 'dantyukhinq@networksolutions.com',
+      age: 27,
+      country: 'China'
+    },
+    { name: 'Keir Fiander', email: 'kfianderr@paypal.com', age: 28, country: 'Indonesia' },
+    {
+      name: 'Jerrie Haslegrave',
+      email: 'jhaslegraves@moonfruit.com',
+      age: 29,
+      country: 'United States'
+    },
+    { name: 'Lawry Yeaman', email: 'lyeamant@facebook.com', age: 30, country: 'Russia' }
+  ]
+
+  reviewData.forEach((row) => {
+    $('#reviewTable tbody').append(`
+      <tr>
+        <td>${row.name}</td>
+        <td>${row.email}</td>
+        <td>${row.age}</td>
+        <td>${row.country}</td>
+      </tr>
+    `)
+  })
+
+  $('#reviewTable').DataTable({
+    pageLength: 10,
+    searching: true,
+    ordering: true
+  })
 
   if (storedUser) {
     currentUser.value = storedUser
